@@ -14,6 +14,8 @@ require (
 	github.com/yuin/gopher-lua v0.0.0-20220504180219-658193537a64
 )
 
+require golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10 // indirect
+
 require (
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/h2non/filetype v1.1.3 // indirect
@@ -21,6 +23,7 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
+	github.com/otiai10/copy v1.9.0
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 	github.com/sendgrid/sendgrid-go v3.12.0+incompatible // indirect
 	github.com/stvoidit/gosmtp v1.0.6 // indirect
