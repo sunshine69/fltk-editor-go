@@ -30,9 +30,8 @@ elif [[ "$OS" =~ MINGW64 ]]; then
     if [ "$MINGW64_ROOT_DIR" == "" ]; then
         MINGW64_ROOT_DIR="c:/tools/msys64/mingw64"
     fi
-    MINGW64_ROOT_OPT="-mingw64-root ${MINGW64_ROOT_DIR}"
 
-    ./${BINARY_NAME}.exe -create-win-bundle $MINGW64_ROOT_OPT ${BINARY_NAME}-windows-bundle
+    ./${BINARY_NAME}.exe -create-win-bundle "$MINGW64_ROOT_DIR" ${BINARY_NAME}-windows-bundle
     pushd .
     cd ..
 
