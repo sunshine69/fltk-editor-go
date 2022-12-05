@@ -142,6 +142,7 @@ type textProcessingDialog struct {
 	bt_find, bt_repl, bt_repl_all *fltk.Button
 	startPos, endPos              int
 	isBackward                    *fltk.CheckButton
+	scriptPath                    string
 }
 
 func NewTextProcessingDialog(app *EditorApp) textProcessingDialog {
@@ -180,10 +181,12 @@ func NewTextProcessingDialog(app *EditorApp) textProcessingDialog {
 				d.replaceText.SetValue("<CMD_OUTPUT>")
 			}
 			bt_find.SetLabel("Exec")
-			bt_repl.SetLabel("Load snippet")
+			bt_repl.SetLabel("Load script")
+			bt_repl_all.SetLabel("Clear script")
 		} else {
 			bt_find.SetLabel("Find")
 			bt_repl.SetLabel("Replace")
+			bt_repl_all.SetLabel("Repl All")
 		}
 	})
 	bt_find.SetCallback(d.FindExec)
@@ -243,13 +246,19 @@ func (d *textProcessingDialog) ExecCodeSnippet() {
 	_tmpF.Write([]byte(text))
 	err := _tmpF.Close()
 	u.CheckErrNonFatal(err, "run-command can not close tmp file")
-	cmdText := fmt.Sprintf("%s %s", keyword, _tmpF.Name())
+	cmdText := fmt.Sprintf("%s %s %s", keyword, d.scriptPath, _tmpF.Name())
 
 	commandList := strings.Fields(cmdText)
 	var outStr string
 	if commandList[0] == "gopher-lua" {
 		// Use internal lua VM to run the code
-		outStr = RunLuaFile(_tmpF.Name())
+		if d.scriptPath == "" {
+			outStr = RunLuaFile(_tmpF.Name())
+		} else {
+			// Inside the script file, get the data file from the env and process it
+			os.Setenv("DATA_FILE", _tmpF.Name())
+			outStr = RunLuaFile(d.scriptPath)
+		}
 	} else {
 		cmd := exec.Command(commandList[0], commandList[1:]...)
 		cmd.Env = append(os.Environ())
@@ -307,11 +316,20 @@ func (d *textProcessingDialog) ReplaceLoad() {
 	if d.bt_repl.Label() == "Replace" {
 		d.app.TextBuffer.ReplaceSelection(d.replaceText.Value())
 	} else {
-
+		fchooser := fltk.NewFileChooser("", "*.*", fltk.FileChooser_SINGLE, "Select script file")
+		fchooser.Popup()
+		fnames := fchooser.Selection()
+		if len(fnames) == 1 {
+			d.scriptPath = fnames[0]
+		}
 	}
 }
 
 func (d *textProcessingDialog) ReplaceAll() {
+	if d.cmd.Value() {
+		d.scriptPath = ""
+		return
+	}
 	txt := strings.TrimSpace(d.input.Value())
 	app := d.app
 	replText := d.replaceText.Value()
@@ -429,7 +447,7 @@ func (app *EditorApp) callbackMenuHelpAbout() {
 func main() {
 	mingw64RootDir := flag.String("create-win-bundle", "", "Pass the mingw64 root dir to create the windows-bundle package")
 	flag.Parse()
-	
+
 	if *mingw64RootDir != "" {
 		CreateWinBundle(*mingw64RootDir)
 		return
