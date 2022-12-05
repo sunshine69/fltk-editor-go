@@ -11,6 +11,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/cjoudrey/gluahttp"
@@ -67,10 +68,10 @@ func (app *EditorApp) BuildGUI() {
 	menuBar.AddEx("Edit", fltk.ALT+'e', nil, fltk.SUBMENU)
 	menuBar.AddEx("Edit/&Toggle Wrap mode", fltk.ALT+'z', app.callbackMenuEditToggleWrapMode, fltk.MENU_VALUE)
 	menuBar.AddEx("Edit/&Find Replace", fltk.CTRL+'f', app.callbackMenuEditFind, fltk.MENU_VALUE)
-	// menuBar.AddEx("Edit/&Paste", fltk.CTRL+'c', app.callbackMenuEditCopy, fltk.MENU_VALUE)
+	menuBar.AddEx("Edit/&Go to line", fltk.CTRL+'g', app.callbackMenuEditGotoLine, fltk.MENU_VALUE)
 	menuBar.AddEx("Help", 0, nil, fltk.SUBMENU)
 	menuBar.Add("Help/&About", app.callbackMenuHelpAbout)
-	menuBar.Add("Help/&Test", app.callbackMenuHelpTest)
+	menuBar.Add("Help/&Debug", app.callbackMenuHelpDebug)
 
 	app.TextBuffer = fltk.NewTextBuffer()
 	app.TextEditor = fltk.NewTextEditor(0, 0, app.Win.W(), app.Win.H()-20)
@@ -86,9 +87,27 @@ func (app *EditorApp) BuildGUI() {
 	app.IsChanged = false
 }
 
-func (app *EditorApp) callbackMenuHelpTest() {
-	app.TextEditor.Copy()
-	app.TextEditor.Paste()
+func (app *EditorApp) callbackMenuEditGotoLine() {
+	input := fltk.InputDialog(1024, "Line number: ")
+	line, err := strconv.Atoi(input)
+	if u.CheckErrNonFatal(err, "callbackMenuEditGotoLine") != nil {
+		fltk.AlertDialog("ERROR\n" + err.Error())
+		return
+	}
+	pos := app.TextEditor.TextDisplay.LineToPosition(line)
+	if pos != -1 {
+		app.TextEditor.TextDisplay.SetInsertPosition(pos)
+		endpos := app.TextEditor.TextDisplay.MoveEndLine()
+		app.TextBuffer.Select(pos, endpos)
+		app.TextEditor.ShowInsertPosition()
+	} else {
+		fltk.AlertDialog("Can not find this line number " + input)
+	}
+}
+
+func (app *EditorApp) callbackMenuHelpDebug() {
+	// output := fmt.Sprintf("%v", app)
+	fltk.MessageBox("DEBUG app obj", u.JsonDump(app, "  "))
 }
 
 func NewEditor() EditorApp {
@@ -183,6 +202,9 @@ func NewTextProcessingDialog(app *EditorApp) textProcessingDialog {
 			bt_find.SetLabel("Exec")
 			bt_repl.SetLabel("Load script")
 			bt_repl_all.SetLabel("Clear script")
+			if input.Value() == "" {
+				input.SetValue("gopher-lua")
+			}
 		} else {
 			bt_find.SetLabel("Find")
 			bt_repl.SetLabel("Replace")
@@ -382,6 +404,7 @@ func (app *EditorApp) LoadFile(filename string) {
 	}
 	app.TextBuffer.SetText(string(textByte))
 	app.FileName = filename
+	fmt.Printf("DEBUG app.filename in LoadFile %s\n", app.FileName)
 	app.Win.SetLabel(filename)
 }
 
@@ -392,7 +415,7 @@ func (app *EditorApp) callbackMenuFileOpen() {
 	fnames := fChooser.Selection()
 	if len(fnames) == 1 {
 		app.LoadFile(fnames[0])
-		fmt.Printf("filename %s\n", fnames[0])
+		// app.FileName = fnames[0]
 	}
 }
 
@@ -448,11 +471,16 @@ func (app *EditorApp) callbackMenuFileSaveAs() {
 		os.WriteFile(fnames[0], []byte(app.TextBuffer.Text()), 0640)
 		app.IsChanged = false
 		app.FileName = fnames[0]
+		app.Win.SetLabel(app.FileName)
 	}
 }
 
 func (app *EditorApp) callbackMenuHelpAbout() {
 	fltk.MessageBox("About", "Text Editor nd Processor")
+	// c := fltk.NewColorChooser(10, 10, 400, 300, "test color")
+	// c.Popup()
+	// fmt.Println("reach here")
+	// c.Destroy()
 }
 
 func main() {
