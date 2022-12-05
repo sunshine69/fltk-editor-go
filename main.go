@@ -428,6 +428,8 @@ func (app *EditorApp) callbackMenuHelpAbout() {
 
 func main() {
 	mingw64RootDir := flag.String("create-win-bundle", "", "Pass the mingw64 root dir to create the windows-bundle package")
+	flag.Parse()
+	
 	if *mingw64RootDir != "" {
 		CreateWinBundle(*mingw64RootDir)
 		return
