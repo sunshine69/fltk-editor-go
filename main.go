@@ -392,6 +392,7 @@ func (app *EditorApp) callbackMenuFileOpen() {
 	fnames := fChooser.Selection()
 	if len(fnames) == 1 {
 		app.LoadFile(fnames[0])
+		fmt.Printf("filename %s\n", fnames[0])
 	}
 }
 
@@ -422,7 +423,17 @@ func (app *EditorApp) callbackMenuFileExit() {
 
 func (app *EditorApp) callbackMenuFileSave() {
 	if app.IsChanged {
+		if app.FileName == "" {
+			fchooser := fltk.NewFileChooser("", "*.*", fltk.FileChooser_CREATE, "Select file name")
+			fchooser.Popup()
+			fnames := fchooser.Selection()
+			if len(fnames) != 1 {
+				return
+			}
+			app.FileName = fnames[0]
+		}
 		info, _ := os.Stat(app.FileName)
+		fmt.Printf("%v\n", info)
 		os.WriteFile(app.FileName, []byte(app.TextBuffer.Text()), info.Mode())
 		app.IsChanged = false
 	}
