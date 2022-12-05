@@ -276,7 +276,7 @@ func (d *textProcessingDialog) ExecCodeSnippet() {
 func (d *textProcessingDialog) Find() {
 	txt := d.input.Value()
 	app := d.app
-
+	d.startPos = d.app.TextEditor.TextDisplay.GetInsertPosition()
 	pos := app.TextBuffer.Search(d.startPos, txt, d.isBackward.Value(), !d.icase.Value())
 	if pos != -1 {
 		d.endPos = pos + len(txt)
@@ -297,7 +297,7 @@ func (d *textProcessingDialog) Find() {
 			}
 			d.startPos = app.TextEditor.TextDisplay.GetInsertPosition()
 		} else {
-			d.startPos = 0
+			app.TextEditor.SetInsertPosition(0)
 		}
 	}
 }
@@ -314,6 +314,7 @@ func (d *textProcessingDialog) ReplaceAll() {
 	txt := strings.TrimSpace(d.input.Value())
 	app := d.app
 	replText := d.replaceText.Value()
+	d.startPos = d.app.TextEditor.TextDisplay.GetInsertPosition()
 	for {
 		pos := app.TextBuffer.Search(d.startPos, txt, false, !d.icase.Value())
 		if pos == -1 {
@@ -323,7 +324,6 @@ func (d *textProcessingDialog) ReplaceAll() {
 		app.TextBuffer.Select(pos, d.endPos)
 		d.app.TextBuffer.ReplaceSelection(replText)
 		d.startPos = pos + len(replText)
-		fmt.Println(pos, d.startPos)
 	}
 }
 
