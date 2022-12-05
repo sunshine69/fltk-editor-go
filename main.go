@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -426,6 +427,11 @@ func (app *EditorApp) callbackMenuHelpAbout() {
 }
 
 func main() {
+	mingw64RootDir := flag.String("create-win-bundle", "", "Pass the mingw64 root dir to create the windows-bundle package")
+	if *mingw64RootDir != "" {
+		CreateWinBundle(*mingw64RootDir)
+		return
+	}
 	NewEditor()
 	fltk.Run()
 }
