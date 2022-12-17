@@ -52,7 +52,7 @@ func (app *EditorApp) BuildGUI() {
 	hpack.SetType(fltk.VERTICAL)
 	hpack.SetSpacing(WIDGET_PADDING)
 
-	menuBar := fltk.NewMenuBar(0, 0, app.Win.W(), 20)
+	menuBar := fltk.NewMenuBar(0, 0, app.Win.W(), 25)
 	menuBar.SetType(uint8(fltk.FLAT_BOX))
 	menuBar.Activate()
 	menuBar.AddEx("File", fltk.ALT+'f', nil, fltk.SUBMENU)
