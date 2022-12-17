@@ -39,8 +39,8 @@ github.com/stvoidit/gosmtp v1.0.6 h1:IuW+vip28KajeE1YKexwnkElY/+SayVzUQt/OjxWPNA
 github.com/stvoidit/gosmtp v1.0.6/go.mod h1:PYNIJYxbFMCjQduAgVsh6L/fyGxxcsLCz2UGvPHoZ18=
 github.com/sunshine69/gluare v0.0.0-20170607022532-d7c94f1a80ed h1:lHdjcXg0AjHM9RiNUbByn7H5koQbZN0yc2ga5a4Wflg=
 github.com/sunshine69/gluare v0.0.0-20170607022532-d7c94f1a80ed/go.mod h1:E2tYRrAsfvQolvtxNbS5uA5lGAe2Y9lHQf8P6XNa8lY=
-github.com/sunshine69/go-fltk v0.0.0-20221217002516-1bc2598781cb h1:S7I+m8xomWNzFzhvrPeoOmsPZPIUD9ZqTYPdfo0TGO8=
-github.com/sunshine69/go-fltk v0.0.0-20221217002516-1bc2598781cb/go.mod h1:uMK5daOr9p+ba2BPs5QadbfaqqrHR5TGj13yWGsAsmw=
+github.com/sunshine69/go-fltk v0.0.0-20221217100050-3dad09675257 h1:fVkrsZOX6ueeYdu73cDjasHRJ6OxvPITyVme6kz2pmU=
+github.com/sunshine69/go-fltk v0.0.0-20221217100050-3dad09675257/go.mod h1:uMK5daOr9p+ba2BPs5QadbfaqqrHR5TGj13yWGsAsmw=
 github.com/sunshine69/golang-tools/utils v0.0.0-20221019025034-d2467f2eea8e h1:UsMosQeEGy4DhxoXoVWfEnEm4Dmujt2RhUyE81UP3+M=
 github.com/sunshine69/golang-tools/utils v0.0.0-20221019025034-d2467f2eea8e/go.mod h1:oLwIL0WDf/NwVNECJufcs3Us4T89EmDCBVX35VVklOw=
 github.com/sunshine69/gopher-json v0.0.0-20221024001855-6c6de212e5bf h1:e1phanUticq+3keFY8OKxVXveSYv16U+TwhdUHhjrVg=

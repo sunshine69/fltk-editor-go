@@ -1,6 +1,6 @@
 module fltkeditor
 
-replace github.com/pwiecz/go-fltk => github.com/sunshine69/go-fltk v0.0.0-20221217002516-1bc2598781cb
+replace github.com/pwiecz/go-fltk => github.com/sunshine69/go-fltk v0.0.0-20221217100050-3dad09675257
 
 go 1.19
 
