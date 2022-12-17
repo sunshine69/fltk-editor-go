@@ -107,7 +107,9 @@ func (app *EditorApp) callbackMenuEditGotoLine() {
 
 func (app *EditorApp) callbackMenuHelpDebug() {
 	// output := fmt.Sprintf("%v", app)
-	fltk.MessageBox("DEBUG app obj", u.JsonDump(app, "  "))
+	// fltk.MessageBox("DEBUG app obj", u.JsonDump(app, "  "))
+	c := fltk.NewColorChooser(0, 0, 400, 300, "test")
+	c.Popup()
 }
 
 func NewEditor() EditorApp {
