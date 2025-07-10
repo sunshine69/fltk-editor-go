@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
@@ -89,6 +88,9 @@ func (app *EditorApp) BuildGUI() {
 
 func (app *EditorApp) callbackMenuEditGotoLine() {
 	input := fltk.InputDialog(1024, "Line number: ")
+	if input == "" {
+		return
+	}
 	line, err := strconv.Atoi(input)
 	if u.CheckErrNonFatal(err, "callbackMenuEditGotoLine") != nil {
 		fltk.AlertDialog("ERROR\n" + err.Error())
@@ -171,7 +173,7 @@ func NewTextProcessingDialog(app *EditorApp) textProcessingDialog {
 	w.Resizable(w)
 	appTitles := strings.Split(app.Win.Label(), string(os.PathSeparator))
 	filename := u.Ternary(len(appTitles) == 1, appTitles[0], appTitles[len(appTitles)-1])
-	w.SetLabel("Search/Replace - " + filename.(string))
+	w.SetLabel("Search/Replace - " + filename)
 	input := fltk.NewInput(10, 10, 220, 25, "")
 	input.SetTooltip("input text or command in command mode")
 	icase := fltk.NewCheckButton(240, 10, 25, 25, "icase")
@@ -243,13 +245,21 @@ func (d *textProcessingDialog) Exec() {
 	} else {
 		keyword := strings.TrimSpace(d.input.Value())
 		if ptn, e := regexp.Compile(keyword); e == nil {
-			outStr = ptn.ReplaceAllString(text, d.replaceText.Value())
+			if d.replaceText.Value() == "" { // do search
+				fmt.Println("do golang regex search")
+				pos := ptn.FindStringIndex(text)
+				app.TextBuffer.Select(pos[0], pos[1])
+			} else {
+				outStr = ptn.ReplaceAllString(text, d.replaceText.Value())
+			}
 		}
 		if !d.new.Value() {
 			if isSelection {
 				d.app.TextBuffer.ReplaceSelection(outStr)
 			} else {
-				d.app.TextBuffer.SetText(outStr)
+				if d.replaceText.Value() != "" {
+					d.app.TextBuffer.SetText(outStr)
+				}
 			}
 		} else {
 			newEditor := NewEditor()
@@ -261,15 +271,20 @@ func (d *textProcessingDialog) Exec() {
 
 func (d *textProcessingDialog) ExecCodeSnippet() {
 	keyword := d.input.Value()
-	_tmpF, _ := ioutil.TempFile("", fmt.Sprintf("fltk-texteditor-*%s", filepath.Ext(d.app.FileName)))
+	_tmpPrefix := fmt.Sprintf("fltk-texteditor-*%s", filepath.Ext(d.app.FileName))
+	// Create temp file and handle errors
+	_tmpF, err := os.CreateTemp("", _tmpPrefix)
+	if err != nil {
+		u.CheckErr(err, "failed to create temp file")
+	}
+	defer _tmpF.Close()
+
 	text, isSelection := d.app.TextBuffer.GetSelectionText(), true
 	if text == "" {
 		text = d.app.TextBuffer.Text()
 		isSelection = false
 	}
-	_tmpF.Write([]byte(text))
-	err := _tmpF.Close()
-	u.CheckErrNonFatal(err, "run-command can not close tmp file")
+
 	cmdText := fmt.Sprintf("%s %s %s", keyword, d.scriptPath, _tmpF.Name())
 
 	commandList := strings.Fields(cmdText)
@@ -288,7 +303,7 @@ func (d *textProcessingDialog) ExecCodeSnippet() {
 		cmd.Env = append(os.Environ())
 		stdoutStderr, err := cmd.CombinedOutput()
 		if err != nil {
-			fmt.Printf("DEBUG E %v\n", err)
+			fmt.Printf("DEBUG %v\n", err)
 		}
 		outStr = string(stdoutStderr)
 	}
